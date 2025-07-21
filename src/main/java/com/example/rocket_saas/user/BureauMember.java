@@ -15,7 +15,7 @@ public class BureauMember {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserAsso user;
     @ManyToOne
     @JoinColumn(name = "association_id")
     private Association association;
@@ -30,11 +30,11 @@ public class BureauMember {
         this.association = association;
     }
 
-    public User getUser() {
+    public UserAsso getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserAsso user) {
         this.user = user;
     }
 

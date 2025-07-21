@@ -1,23 +1,30 @@
 package com.example.rocket_saas.annoucement;
 
 import com.example.rocket_saas.association.Association;
-import com.example.rocket_saas.user.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.rocket_saas.user.UserAsso;
+import jakarta.persistence.*;
 
 import java.util.Date;
 
 @Entity
 public class Announcement {
     @Id
+    @SequenceGenerator(
+            name = "announcement_sequence",
+            sequenceName = "announcement_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "announcement_sequence"
+
+    )
     private Long id;
     private String title;
     private String content;
     @ManyToOne
     @JoinColumn(name = "author_id")
-    private User author;
+    private UserAsso author;
     private Date date;
     @ManyToOne
     @JoinColumn(name = "association_id")
@@ -33,11 +40,11 @@ public class Announcement {
     }
 
 
-    public User getAuthor() {
+    public UserAsso getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(UserAsso author) {
         this.author = author;
     }
 

@@ -1,7 +1,7 @@
 package com.example.rocket_saas.activity;
 
 import com.example.rocket_saas.association.Association;
-import com.example.rocket_saas.user.User;
+import com.example.rocket_saas.user.UserAsso;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -11,6 +11,16 @@ import java.util.List;
 @Entity
 public class Activity {
     @Id
+    @SequenceGenerator(
+            name = "activity_sequence",
+            sequenceName = "activity_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "activity_sequence"
+
+    )
     private Long id;
     private String name;
     private String description;
@@ -21,13 +31,13 @@ public class Activity {
     private Association association;
     @ManyToOne
     @JoinColumn(name = "created_by_id")
-    private User createdBy;
+    private UserAsso createdBy;
 
-    public User getCreatedBy() {
+    public UserAsso getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(UserAsso createdBy) {
         this.createdBy = createdBy;
     }
 
