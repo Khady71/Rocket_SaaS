@@ -31,8 +31,9 @@ public class UserAsso {
     private Association association;
     private String password;
 
-    public UserAsso() {
-
+    public UserAsso(String email,String password) {
+        this.email = email;
+        this.password = password;
     }
 
     public UserAsso(String firstName, String lastName, String email, String phone, Role role, Association association) {
