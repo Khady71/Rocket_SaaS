@@ -31,9 +31,17 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/**") // on sécurise toutes les routes ici
+                .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/api/public/**", "/asso/**", "/auth/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/api/public/**",
+                                "/asso/**",
+                                "/api/auth/superadmin/signup",
+                                "/api/auth/superadmin/signin",
+                                "/api/auth/admin/signup",
+                                "/api/auth/admin/signin"
+                        ).permitAll() //
                         .requestMatchers("/api/superadmin/**").hasRole("SUPER_ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

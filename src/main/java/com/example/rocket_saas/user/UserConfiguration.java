@@ -14,28 +14,28 @@ public class UserConfiguration {
         this.associationRepository = associationRepository;
     }
 
-    @Bean
-    CommandLineRunner initializeUser(UserRepository repository) {
-        return args -> {
-            Association associationcesval = associationRepository.findAssociationBySigle("CESVAL")
-                    .orElseGet(() -> associationRepository.save(
-                            new Association("CESVAL", "Some description")
-                    ));
-
-
-            UserAsso adminAssoVal = new UserAsso(
-                    "John",
-                    "Doe",
-                    "kgaye809@gmail.com",
-                    "+3375544885",
-                    Role.ASSO_ADMIN ,
-                    associationcesval
-
-            );
-
-            repository.save(adminAssoVal);
-
-        };
-    }
+  //  @Bean
+//    CommandLineRunner initializeUser(UserRepository repository) {
+//        return args -> {
+//            Association associationcesval = associationRepository.findAssociationBySigle("CESVAL")
+//                    .orElseGet(() -> associationRepository.save(
+//                            new Association("CESVAL", "Some description")
+//                    ));
+//
+//
+//            UserAsso adminAssoval = new UserAsso(
+//                    "John",
+//                    "Doe",
+//                    "kgaye809@gmail.com",
+//                    "+3375544885",
+//                    Role.ASSO_ADMIN ,
+//                    associationcesval
+//
+//            );
+//
+//            repository.save(adminAssoVal);
+//
+//        };
+//    }
 
 }

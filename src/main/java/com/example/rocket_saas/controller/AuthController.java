@@ -1,17 +1,21 @@
 package com.example.rocket_saas.controller;
 
+import com.example.rocket_saas.authentication.LoginRequest;
+import com.example.rocket_saas.user.Role;
 import com.example.rocket_saas.user.UserAsso;
 import com.example.rocket_saas.user.UserRepository;
 import com.example.rocket_saas.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import com.example.rocket_saas.authentication.JwtAuthResponse;
+import com.example.rocket_saas.authentication.SignupRequest;
 
 
 @RestController
@@ -30,39 +34,80 @@ public class AuthController {
     @Autowired
     private JwtService jwtService;
 
-    // === LOGIN ===
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody User loginRequest) {
+
+    // === ADMIN LOGIN ===
+    @PostMapping("/admin/signin")
+    public ResponseEntity<?> authenticateAdminUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String jwt = jwtService.generateToken(userDetails);
+        String jwt = new JwtAuthResponse( jwtService.generateToken(userDetails)).toString();
 
         return ResponseEntity.ok(jwt);
     }
 
-    // === REGISTER ===
-    @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody User userRequest) {
-        if (userRepository.existsByEmail(userRequest.getUsername())) {
+    // === ADMIN REGISTER ===
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/admin/signup")
+    public ResponseEntity<?> registerAdminUser(@RequestBody SignupRequest userRequest) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body("Error: Username is already taken!");
         }
 
         UserAsso newUser = new UserAsso(
-                userRequest.getUsername(),
+                userRequest.getEmail(),
                 encoder.encode(userRequest.getPassword())
         );
+
+        newUser.setRole(Role.ASSO_ADMIN);
+
+        userRepository.save(newUser);
+
+        return ResponseEntity.ok("UserAdmin registered successfully!");
+    }
+
+    // === SUPER ADMIN REGISTER ===
+    @PostMapping("/superadmin/signup")
+    public ResponseEntity<?> registerSuperAdmin(@RequestBody SignupRequest userRequest) {
+        if (userRepository.existsByEmail(userRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Error: Username is already taken!");
+        }
+
+        UserAsso newUser = new UserAsso(
+                userRequest.getEmail(),
+                encoder.encode(userRequest.getPassword())
+        );
+
+        newUser.setRole(Role.SUPER_ADMIN);
 
         userRepository.save(newUser);
 
         return ResponseEntity.ok("User registered successfully!");
     }
+
+    @PostMapping("/superadmin/signin")
+    public ResponseEntity<?> superAdminLogin(@RequestBody LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+        );
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        String jwt = new JwtAuthResponse( jwtService.generateToken(userDetails)).toString();
+
+        return ResponseEntity.ok(jwt);
+    }
+
+
+
 }
