@@ -6,9 +6,6 @@ import jakarta.persistence.*;
 @Entity
 public class UserAsso {
 
-
-
-
     @Id
     @SequenceGenerator(
             name = "UserAsso_sequence",
@@ -23,11 +20,14 @@ public class UserAsso {
     private Long id;
     private String firstName;
     private String lastName;
+    @Column(unique = true, nullable = false, length = 255)
     private String email;
     private String phone;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private Role role;
     @ManyToOne
-    @JoinColumn(name = "association_id")
+    @JoinColumn(name = "association_id",nullable = true)
     private Association association;
     private String password;
 
@@ -43,6 +43,9 @@ public class UserAsso {
         this.phone = phone;
         this.role = role;
         this.association = association;
+    }
+
+    public UserAsso() {
     }
 
     public Association getAssociation() {

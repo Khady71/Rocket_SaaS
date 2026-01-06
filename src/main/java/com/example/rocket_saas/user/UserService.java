@@ -37,7 +37,7 @@ public class UserService {
 
 
 
-    // ✅ Mettre à jour un utilisateur
+
     public UserAsso updateUser(Long id, UserAsso updatedUser) {
         UserAsso existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Utilisateur non trouvé"));

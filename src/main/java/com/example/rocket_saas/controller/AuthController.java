@@ -1,11 +1,15 @@
 package com.example.rocket_saas.controller;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.example.rocket_saas.authentication.LoginRequest;
+import com.example.rocket_saas.dto.ApiResponse;
 import com.example.rocket_saas.user.Role;
 import com.example.rocket_saas.user.UserAsso;
 import com.example.rocket_saas.user.UserRepository;
 import com.example.rocket_saas.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
@@ -16,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import com.example.rocket_saas.authentication.JwtAuthResponse;
 import com.example.rocket_saas.authentication.SignupRequest;
+
 
 
 @RestController
@@ -47,9 +52,7 @@ public class AuthController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String jwt = new JwtAuthResponse( jwtService.generateToken(userDetails)).toString();
-
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(new JwtAuthResponse( jwtService.generateToken(userDetails)));
     }
 
     // === ADMIN REGISTER ===
@@ -58,8 +61,9 @@ public class AuthController {
     public ResponseEntity<?> registerAdminUser(@RequestBody SignupRequest userRequest) {
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             return ResponseEntity
-                    .badRequest()
-                    .body("Error: Username is already taken!");
+                    .status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ApiResponse("Email already exists!"));
         }
 
         UserAsso newUser = new UserAsso(
@@ -70,30 +74,33 @@ public class AuthController {
         newUser.setRole(Role.ASSO_ADMIN);
 
         userRepository.save(newUser);
+        System.out.println("Useradmin created");
+        String message = "UserAdmin registered successfully!";
+        return ResponseEntity.ok(new ApiResponse(message));
 
-        return ResponseEntity.ok("UserAdmin registered successfully!");
     }
 
-    // === SUPER ADMIN REGISTER ===
-    @PostMapping("/superadmin/signup")
-    public ResponseEntity<?> registerSuperAdmin(@RequestBody SignupRequest userRequest) {
-        if (userRepository.existsByEmail(userRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error: Username is already taken!");
-        }
-
-        UserAsso newUser = new UserAsso(
-                userRequest.getEmail(),
-                encoder.encode(userRequest.getPassword())
-        );
-
-        newUser.setRole(Role.SUPER_ADMIN);
-
-        userRepository.save(newUser);
-
-        return ResponseEntity.ok("User registered successfully!");
-    }
+    //To be deleted, super_admin will be created directly in the database
+    // === SUPER ADMIN SIGNUP ===
+//    @PostMapping("/superadmin/signup")
+//    public ResponseEntity<?> registerSuperAdmin(@RequestBody SignupRequest userRequest) {
+//        if (userRepository.existsByEmail(userRequest.getEmail())) {
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body("Error: Username is already taken!");
+//        }
+//
+//        UserAsso newUser = new UserAsso(
+//                userRequest.getEmail(),
+//                encoder.encode(userRequest.getPassword())
+//        );
+//
+//        newUser.setRole(Role.SUPER_ADMIN);
+//
+//        userRepository.save(newUser);
+//
+//        return ResponseEntity.ok("User registered successfully!");
+//    }
 
     @PostMapping("/superadmin/signin")
     public ResponseEntity<?> superAdminLogin(@RequestBody LoginRequest request) {
@@ -103,9 +110,9 @@ public class AuthController {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String jwt = new JwtAuthResponse( jwtService.generateToken(userDetails)).toString();
+        JwtAuthResponse resp = new JwtAuthResponse(jwtService.generateToken(userDetails));
 
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(resp);
     }
 
 

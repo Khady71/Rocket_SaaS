@@ -41,6 +41,13 @@ public class Association {
         this.createdAt = createdAt;
     }
 
+    public Association(String name, String sigle, String city, String description) {
+        this.name = name;
+        this.sigle = sigle;
+        this.city = city;
+        this.description = description;
+    }
+
     public Association(String sigle, String description) {
         this.sigle = sigle;
         this.description = description;

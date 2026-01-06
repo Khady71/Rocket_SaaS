@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import java.util.Date;
 
 @Entity
-public class BureauMember {
+public class BoardMember {
     @Id
     private Long id;
     @ManyToOne

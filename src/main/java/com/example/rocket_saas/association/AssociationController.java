@@ -3,12 +3,14 @@ package com.example.rocket_saas.association;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping(path = "api/asso")
 public class AssociationController {
     private final AssociationService associationService;
 
@@ -29,10 +31,13 @@ public class AssociationController {
     }
 
     // 🔹 POST create new association
-    @PostMapping
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PostMapping("/create")
     public ResponseEntity<Association> createAssociation(@RequestBody Association association) {
         Association saved = associationService.registerNewAssociation(association);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(saved);
     }
 
     // 🔹 PUT update association
